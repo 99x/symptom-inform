@@ -1,9 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  form-submission
-
-  Sample SAM Template for form-submission
+  form-submission deployment template
 Parameters:
   ApiStage:
     Description: Form submission API stage
@@ -15,13 +13,68 @@ Globals:
     Timeout: 10
 
 Resources:
+  Proxy:
+    Type: "AWS::CloudFront::Distribution"
+    Properties:
+      DistributionConfig:
+        Comment: "Cloudfront distribution for serverless website"
+        DefaultRootObject: "index.html"
+        Enabled: true
+        HttpVersion: http2
+        # List of origins that Cloudfront will connect to
+        Origins:
+          - Id: s3-frontend
+            DomainName: !GetAtt FrontendBucket.DomainName
+            S3OriginConfig:
+              # Restricting Bucket access through an origin access identity
+              OriginAccessIdentity: 
+                Fn::Sub: 'origin-access-identity/cloudfront/${ProxyFrontendBucketAccess}'
+        # To connect the CDN to the origins you need to specify behaviours
+        DefaultCacheBehavior:
+          # Compress resources automatically ( gzip )
+          Compress: 'true'
+          AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+          ForwardedValues:
+            QueryString: false
+          TargetOriginId: s3-frontend
+          ViewerProtocolPolicy : redirect-to-https
+
+  ProxyFrontendBucketAccess:
+    Type: 'AWS::CloudFront::CloudFrontOriginAccessIdentity'
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: 'Form submission frontend access'
+
   FrontendBucket:
     Type: AWS::S3::Bucket
+    # Properties:
+      # Change bucket name to reflect your website
+     # BucketName: <YOURSWEBSITE.COM>
+
+  FrontendBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref FrontendBucket
+      PolicyDocument:
+      # Restricting access to cloudfront only.
+        Statement:
+          -
+            Effect: Allow
+            Action: 's3:GetObject'
+            Resource:
+              - !Sub "arn:aws:s3:::${FrontendBucket}/*"
+            Principal:
+              AWS: !Sub "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${ProxyFrontendBucketAccess}"
+
   FormSubmissionApi:
     Type: AWS::Serverless::Api
     Properties:
       StageName: !Ref ApiStage
       EndpointConfiguration: REGIONAL
+      
   FormSubmissionFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -38,9 +91,9 @@ Resources:
   
 
 Outputs:
-  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
-  # Find out more about other implicit resources you can reference within SAM
-  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  FormSubmissionFrontendBucket:
+    Description: "Form submission frontend bucket"
+    Value: !GetAtt FrontendBucket.DomainName
   FormSubmissionApi:
     Description: "API Gateway endpoint URL for Form Submission function"
     Value: !Sub "https://${FormSubmissionApi}.execute-api.${AWS::Region}.amazonaws.com/${ApiStage}/submit"
