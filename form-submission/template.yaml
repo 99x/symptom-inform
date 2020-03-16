@@ -6,7 +6,7 @@ Parameters:
   ApiStage:
     Description: Form submission API stage
     Type: String
-    Default: prod
+    Default: api
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
@@ -36,7 +36,7 @@ Resources:
               HTTPSPort: '443'
               OriginKeepaliveTimeout: '20'
               OriginReadTimeout: '20'
-              OriginProtocolPolicy: http-only
+              OriginProtocolPolicy: https-only
               OriginSSLProtocols:
                 - TLSv1
                 - TLSv1.1
@@ -76,7 +76,7 @@ Resources:
               - Referer
               - Origin
               - Authorization
-          ViewerProtocolPolicy: allow-all
+          ViewerProtocolPolicy: https-only
           MinTTL: '0'
           MaxTTL: '0'
           DefaultTTL: '0'
