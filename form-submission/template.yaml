@@ -53,7 +53,30 @@ Resources:
             QueryString: false
           TargetOriginId: s3-frontend
           ViewerProtocolPolicy : redirect-to-https
-
+        CacheBehaviors:
+        - AllowedMethods:
+          - DELETE
+          - GET
+          - HEAD
+          - OPTIONS
+          - PATCH
+          - POST
+          - PUT
+          TargetOriginId: api-gateway
+          ForwardedValues:
+            QueryString: 'true'
+            Cookies:
+              Forward: none
+          ViewerProtocolPolicy: allow-all
+          MinTTL: '0'
+          MaxTTL: '0'
+          DefaultTTL: '0'
+          PathPattern: !Sub "/${ApiStage}/*"
+        CustomErrorResponses:
+        - ErrorCode: '403'
+          ResponsePagePath: "/index.html"
+          ResponseCode: '200'
+          ErrorCachingMinTTL: '30'
   ProxyFrontendBucketAccess:
     Type: 'AWS::CloudFront::CloudFrontOriginAccessIdentity'
     Properties:
