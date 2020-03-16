@@ -2,7 +2,7 @@
 This repository contains a sample application to submit medical symptoms
 
 ## Form Handler
-![Alt text](99xt/symptom-inform/master/docs/images/form-handler.png?raw=true "Title")
+![Alt text](99xt/symptom-inform/master/docs/form-submit-flow.jpeg?raw=true "Title")
 
 
 This module contians the form submission data
