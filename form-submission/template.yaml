@@ -4,13 +4,22 @@ Description: >
   form-submission
 
   Sample SAM Template for form-submission
-  
+Parameters:
+  ApiStage:
+    Description: Form submission API stage
+    Type: String
+    Default: api
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
     Timeout: 3
 
 Resources:
+  FormSubmissionApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref ApiStage
+      EndpointConfiguration: REGIONAL
   FormSubmissionFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -18,19 +27,20 @@ Resources:
       Handler: app.lambdaHandler
       Runtime: nodejs12.x
       Events:
-        FormSubmission:
+        FormSubmissionApi:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
             Path: /submit
             Method: get
+            RestApiId: !Ref FormSubmissionApi
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
   FormSubmissionApi:
-    Description: "API Gateway endpoint URL for Prod stage for Form Submission function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/submit/"
+    Description: "API Gateway endpoint URL for Form Submission function"
+    Value: !Sub "https://${FormSubmissionApi}.execute-api.${AWS::Region}.amazonaws.com/${ApiStage}/submit"
   FormSubmissionFunction:
     Description: "Form Submission Lambda Function ARN"
     Value: !GetAtt FormSubmissionFunction.Arn
