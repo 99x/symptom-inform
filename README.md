@@ -2,8 +2,7 @@
 This repository contains a sample application to submit medical symptoms
 
 ## Form Handler
-![Alt text](../master/docs/form-submit-flow.jpeg?raw=true "Title")
-
+![Highlevel-Design](docs/form-submit-flow.jpeg?raw=true "Highlevel Design")
 
 This module contians the form submission data
 1. Guidelines to create HTML https://izifortune.com/serverless-website-sam-aws/
