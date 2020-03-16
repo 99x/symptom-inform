@@ -7,7 +7,11 @@ Parameters:
     Description: Form submission API stage
     Type: String
     Default: api
-# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+    AllowedValues: 
+      - api
+      - api-dev
+      - api-qa
+
 Globals:
   Function:
     Timeout: 10
@@ -135,9 +139,12 @@ Resources:
   
 
 Outputs:
-  CloudFrontDistribution:
+  CloudFrontDistributionFrontendUrl:
     Description: "CloudFront distribution url"
-    Value: !GetAtt Proxy.DomainName
+    Value: !Sub "https://${Proxy.DomainName}"
+  CloudFrontDistributionSubmitApiUrl:
+    Description: "CloudFront distribution url"
+    Value: !Sub "https://${Proxy.DomainName}/${ApiStage}/submit"
   FormSubmissionFrontendBucket:
     Description: "Form submission frontend bucket"
     Value: !GetAtt FrontendBucket.DomainName
