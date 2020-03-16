@@ -67,6 +67,15 @@ Resources:
             QueryString: 'true'
             Cookies:
               Forward: none
+            Headers:
+              - Accept
+              - Accept-Charset
+              - Accept-Datetime
+              - Accept-Language
+              - Accept-Encoding
+              - Referer
+              - Origin
+              - Authorization
           ViewerProtocolPolicy: allow-all
           MinTTL: '0'
           MaxTTL: '0'
@@ -126,6 +135,9 @@ Resources:
   
 
 Outputs:
+  CloudFrontDistribution:
+    Description: "CloudFront distribution url"
+    Value: !GetAtt Proxy.DomainName
   FormSubmissionFrontendBucket:
     Description: "Form submission frontend bucket"
     Value: !GetAtt FrontendBucket.DomainName
