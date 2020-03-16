@@ -29,6 +29,18 @@ Resources:
               # Restricting Bucket access through an origin access identity
               OriginAccessIdentity: 
                 Fn::Sub: 'origin-access-identity/cloudfront/${ProxyFrontendBucketAccess}'
+          - Id: api-gateway
+            DomainName: !Sub "${FormSubmissionApi}.execute-api.${AWS::Region}.amazonaws.com"
+            CustomOriginConfig:
+              HTTPPort: '80'
+              HTTPSPort: '443'
+              OriginKeepaliveTimeout: '20'
+              OriginReadTimeout: '20'
+              OriginProtocolPolicy: http-only
+              OriginSSLProtocols:
+                - TLSv1
+                - TLSv1.1
+                - TLSv1.2
         # To connect the CDN to the origins you need to specify behaviours
         DefaultCacheBehavior:
           # Compress resources automatically ( gzip )
