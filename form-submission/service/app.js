@@ -12,7 +12,7 @@ exports.lambdaHandler = async (event) => {
             Item: {
                 Id: uuid.v4(),
                 CreatedAt: (new Date().getTime()).toString(),
-                Symptoms: JSON.parse(event.body)
+                FormData: JSON.parse(event.body)
             }
         }
 
