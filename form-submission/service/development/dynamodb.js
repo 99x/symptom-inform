@@ -1,7 +1,6 @@
 'use strict';
 
 const AWS = require("aws-sdk");
-const dynamodbLocal = require("dynamodb-localhost");
 
 AWS.config.update({
     region: "us-west-1",
@@ -15,7 +14,7 @@ exports.setup = async () => {
 
             var dynamodb = new AWS.DynamoDB();
             var params = {
-                TableName: "Local_Form_Data",
+                TableName: "Form_Data",
                 KeySchema: [
                     { AttributeName: "Id", KeyType: "HASH" },
                     { AttributeName: "CreatedAt", KeyType: "RANGE" }

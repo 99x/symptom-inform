@@ -1,18 +1,13 @@
 'use strict';
 
 exports.init = (AWS) => {
-    let endpoint;
 
-    if (process.env.AWS_SAM_LOCAL) {
-        endpoint = 'http://DynamoDBEndpoint:8000'
-    } else if (!process.env.AppEnv) {
-        endpoint = 'http://localhost:8000'
+    if (process.env.AWS_SAM_LOCAL || !process.env.LAMBDA_TASK_ROOT) {
+        AWS.config.update({
+            region: "us-west-1",
+            endpoint: process.env.AWS_SAM_LOCAL ? 'http://dynamodb:8000' : 'http://localhost:8000'
+        });
+        process.env.TABLE_NAME = process.env.TABLE_NAME || "Form_Data";
     }
 
-    AWS.config.update({
-        region: "us-west-1",
-        endpoint: endpoint
-    });
-
-    process.env.TABLE_NAME = process.env.TABLE_NAME || "Local_Form_Data";
 };

@@ -8,7 +8,7 @@ Parameters:
   AppEnv:
     Description: App Deployment Environment
     Type: String
-    AllowedValues: ['Local', 'Dev', 'QA', 'Stage', 'Prod']
+    AllowedValues: ['Dev', 'QA', 'Stage', 'Prod']
 
 Globals:
   Function:
