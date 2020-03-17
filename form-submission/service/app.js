@@ -1,6 +1,9 @@
 // const axios = require('axios')
 // const url = 'http://checkip.amazonaws.com/';
+const AWS = require('aws-sdk');
+const uuid = require('uuid');
 let response;
+let tableName;
 
 /**
  *
@@ -15,12 +18,13 @@ let response;
  * 
  */
 exports.lambdaHandler = async (event, context) => {
+    tableName = process.env.TABLE_NAME;
     try {
         // const ret = await axios(url);
         response = {
             'statusCode': 200,
             'body': JSON.stringify({
-                message: 'Form submission succesfull!',
+                message: 'Form submission succesfull! TableName:' + tableName,
                 // location: ret.data.trim()
             })
         }
