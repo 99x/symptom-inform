@@ -22,18 +22,16 @@ $(document).ready(function () {
   });
 
   $("#q1").click(function () {
-
     $(this).css({ "display": "none" });
   });
+
   $("#q2").click(function () {
-
     $(this).css({ "display": "none" });
   });
-  $("#q3").click(function () {
 
+  $("#q3").click(function () {
     $('#survey-wrapper').addClass('remove');
     $('#start-survey').addClass('start');
   });
-
 
 });
