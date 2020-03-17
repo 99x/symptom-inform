@@ -1,3 +1,5 @@
+'use strict';
+
 const AWS = require('aws-sdk');
 const uuid = require('uuid');
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
@@ -21,13 +23,12 @@ exports.lambdaHandler = async (event) => {
         return {
             'statusCode': 200,
             'body': JSON.stringify({
-                message: 'Form submission succesfull!'
+                message: 'success'
             })
         };
 
     } catch (err) {
         return err;
     }
-    
+
 };
-  

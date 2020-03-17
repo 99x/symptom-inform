@@ -148,4 +148,3 @@ Outputs:
   FormDataDynamoDBTableName:
     Description: "Dynamodb table used to store form data"
     Value: !Select [1, !Split ['/', !GetAtt FormDataTable.Arn]]
-
