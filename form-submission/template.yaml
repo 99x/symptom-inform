@@ -25,12 +25,10 @@ Resources:
         DefaultRootObject: "index.html"
         Enabled: true
         HttpVersion: http2
-        # List of origins that Cloudfront will connect to
         Origins:
           - Id: s3-frontend
             DomainName: !GetAtt FrontendBucket.DomainName
             S3OriginConfig:
-              # Restricting Bucket access through an origin access identity
               OriginAccessIdentity: 
                 Fn::Sub: 'origin-access-identity/cloudfront/${ProxyFrontendBucketAccess}'
           - Id: api-gateway
@@ -45,9 +43,7 @@ Resources:
                 - TLSv1
                 - TLSv1.1
                 - TLSv1.2
-        # To connect the CDN to the origins you need to specify behaviours
         DefaultCacheBehavior:
-          # Compress resources automatically ( gzip )
           Compress: 'true'
           AllowedMethods:
             - GET
@@ -90,6 +86,7 @@ Resources:
           ResponsePagePath: "/index.html"
           ResponseCode: '200'
           ErrorCachingMinTTL: '30'
+          
   ProxyFrontendBucketAccess:
     Type: 'AWS::CloudFront::CloudFrontOriginAccessIdentity'
     Properties:
@@ -98,9 +95,6 @@ Resources:
 
   FrontendBucket:
     Type: AWS::S3::Bucket
-    # Properties:
-      # Change bucket name to reflect your website
-     # BucketName: <YOURSWEBSITE.COM>
 
   FrontendBucketPolicy:
     Type: AWS::S3::BucketPolicy
@@ -129,6 +123,9 @@ Resources:
       CodeUri: service/
       Handler: app.lambdaHandler
       Runtime: nodejs12.x
+      Environment:
+        Variables:
+          TABLE_NAME: !Select [1, !Split ['/', !GetAtt FormSubmissionsTable.Arn]]
       Events:
         FormSubmissionApi:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
@@ -136,7 +133,26 @@ Resources:
             Path: /submit
             Method: get
             RestApiId: !Ref FormSubmissionApi
-  
+
+  FormSubmissionsTable: 
+    Type: AWS::DynamoDB::Table
+    Properties: 
+      AttributeDefinitions:       
+        - 
+          AttributeName: "Id"
+          AttributeType: "S"
+        - 
+          AttributeName: "CreatedAt"
+          AttributeType: "S"
+      KeySchema: 
+        - 
+          AttributeName: "Id"
+          KeyType: "HASH"
+        - 
+          AttributeName: "CreatedAt"
+          KeyType: "RANGE"
+      TableName: !Sub "${ApiStage}_form_submissions"
+      BillingMode: PAY_PER_REQUEST          
 
 Outputs:
   CloudFrontDistributionFrontendUrl:
@@ -154,6 +170,7 @@ Outputs:
   FormSubmissionFunction:
     Description: "Form Submission Lambda Function ARN"
     Value: !GetAtt FormSubmissionFunction.Arn
-  FormSubmissionFunctionIamRole:
-    Description: "Implicit IAM Role created for Form Submission function"
-    Value: !GetAtt FormSubmissionFunctionRole.Arn
+  FormSubmissionsTableName:
+    Description: "Form submission dynamodb table"
+    Value: !Select [1, !Split ['/', !GetAtt FormSubmissionsTable.Arn]]
+
