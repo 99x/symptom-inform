@@ -1,5 +1,66 @@
-<html>	
-<body>	
-  <h1>Submit Your Symptoms</h1>	
-</body>	
-</html> 
+<html>
+<title>Symptom Inform Platform</title>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+  <link rel="stylesheet" href="./style.css">
+
+</head>
+
+<body>
+
+  <form id="survey-form">
+    <div id="start-survey">
+      <div class="start-survey-items">
+        <h1>Submit Your Symptoms</h1>
+        <h1>Check what advice and measures apply to you</h1>
+        <p>Last updated 17.03.2020 at. 4:35</p>
+        <div>Check your symptoms</div>
+      </div>
+    </div>
+    <div id="previous-question">Previous Question</div>
+    <div id="survey-wrapper">
+      <div class="survey-question" id="q1">
+        <div class="question-items">
+          Are you a health professional?
+          <input type="radio" name="group1" id="group1-option1" value="Yes" />
+          <label for="group1-option1">Yes</label>
+          or
+          <input type="radio" name="group1" id="group1-option2" value="No" />
+          <label for="group1-option2">No</label>
+          ?
+        </div>
+      </div>
+      <div class="survey-question" id="q2">
+        <div class="question-items">
+          Do you feel sick?
+          <input type="radio" name="group2" id="group2-option1" value="Yes" />
+          <label for="group2-option1">Yes</label>,
+          or
+          <input type="radio" name="group2" id="group2-option3" value="No" />
+          <label for="group2-option3">No</label>?
+        </div>
+      </div>
+      <div class="survey-results" id="q3">
+        <div class="results-items">
+          <h2>You're done!</h2>
+          <p>
+            Sugessions <span class="response-span" id="group4-response"></span> <span class="response-span"
+              id="group1-response"></span> from <span class="response-span" id="group2-response"></span>.
+          </p>
+          <button id="start-over" type="reset">Start Over</button><button id="submit" type="submit">Submit
+            Results</button>
+        </div>
+      </div>
+    </div>
+    <div id="progress-wrapper">
+      <div id="progress-bar" data-progress="0"></div>
+    </div>
+  </form>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+  <script src="./script.js"></script>
+</body>
+
+</html>
