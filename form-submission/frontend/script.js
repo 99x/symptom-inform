@@ -1,3 +1,20 @@
+$.fn.serializeObject = function()
+{
+   var o = {};
+   var a = this.serializeArray();
+   $.each(a, function() {
+       if (o[this.name]) {
+           if (!o[this.name].push) {
+               o[this.name] = [o[this.name]];
+           }
+           o[this.name].push(this.value || '');
+       } else {
+           o[this.name] = this.value || '';
+       }
+   });
+   return o;
+};
+
 $(document).ready(function () {
   // Initialize Progress Bar
   var totalQuestions = ($(".survey-question").length);
@@ -34,4 +51,17 @@ $(document).ready(function () {
     $('#start-survey').addClass('start');
   });
 
+  $("#submit").click(function (e) {
+    e.preventDefault();
+    var data = $("form").serializeObject();
+    $.ajax({
+      type: "POST",
+      contentType: "application/json;charset=utf-8",
+      url: "https://d29l6e9wtrec9i.cloudfront.net/api/submit",
+      data: JSON.stringify(data),
+      success: function (result) {
+        alert('Your information submitted succesfully !');
+      }
+    });
+  });
 });
