@@ -25,16 +25,24 @@ e.g
 sam deploy --parameter-overrides APIBasePath=api AppEnv=Dev
 
 ## Running dynamodb locally
-Dynamodb locally is powered by the following NPM library, if you encounter any issues refer its documentation.
-https://www.npmjs.com/package/dynamodb-localhost
+Create a bridge network for Sam container communication
+ docker network create -d bridge sam-local
 
-Go to form-submissions/service and execute the following
+Download and run DynamoDB docker container
+ docker run -p 8000:8000 --network sam-local --name DynamoDBEndpoint amazon/dynamodb-local
+
+Go to form-submissions/service and execute the following to create the Dynamodb tables
 npm run dynamodb
+
+Invoke lambda function locally
+sam local invoke --docker-network sam-local FormDataLambda --event events/event.json
+
+
+### Other Tools (Working with DynamoDB Local)
 
 To view all the tables use following command in CLI
 aws dynamodb list-tables --endpoint-url http://localhost:8000 --region us-west-1
 
 View table data
  aws dynamodb scan --table-name Local_Form_Data --endpoint-url http://localhost:8000 --region us-west-1
-
 

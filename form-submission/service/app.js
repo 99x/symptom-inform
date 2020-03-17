@@ -2,6 +2,10 @@
 
 const AWS = require('aws-sdk');
 const uuid = require('uuid');
+
+const devConfig = require('./development/config')
+devConfig.init(AWS);
+
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 const tableName = process.env.TABLE_NAME;
 
