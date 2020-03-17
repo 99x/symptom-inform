@@ -1,16 +1,10 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: >
-  form-submission deployment template
+Description: "form-submission cloudformation template"
 Parameters:
   ApiStage:
     Description: Form submission API stage
     Type: String
-    Default: api
-    AllowedValues: 
-      - api
-      - api-dev
-      - api-qa
 
 Globals:
   Function:
@@ -39,43 +33,22 @@ Resources:
               OriginKeepaliveTimeout: '20'
               OriginReadTimeout: '20'
               OriginProtocolPolicy: https-only
-              OriginSSLProtocols:
-                - TLSv1
-                - TLSv1.1
-                - TLSv1.2
+              OriginSSLProtocols: ['TLSv1', 'TLSv1.1', 'TLSv1.2'] 
         DefaultCacheBehavior:
           Compress: 'true'
-          AllowedMethods:
-            - GET
-            - HEAD
-            - OPTIONS
+          AllowedMethods: ['GET', 'HEAD', 'OPTIONS']
           ForwardedValues:
             QueryString: false
           TargetOriginId: s3-frontend
           ViewerProtocolPolicy : redirect-to-https
         CacheBehaviors:
-        - AllowedMethods:
-          - DELETE
-          - GET
-          - HEAD
-          - OPTIONS
-          - PATCH
-          - POST
-          - PUT
+        - AllowedMethods: ['HEAD', 'OPTIONS', 'GET', 'POST', 'PUT', 'PATCH', 'DELETE']
           TargetOriginId: api-gateway
           ForwardedValues:
             QueryString: 'true'
             Cookies:
               Forward: none
-            Headers:
-              - Accept
-              - Accept-Charset
-              - Accept-Datetime
-              - Accept-Language
-              - Accept-Encoding
-              - Referer
-              - Origin
-              - Authorization
+            Headers: ['Accept', 'Accept-Charset', 'Accept-Datetime', 'Accept-Language', 'Accept-Encoding', 'Referer', 'Origin', 'Authorization']
           ViewerProtocolPolicy: https-only
           MinTTL: '0'
           MaxTTL: '0'
@@ -157,21 +130,21 @@ Resources:
 
 Outputs:
   CloudFrontDistributionFrontendUrl:
-    Description: "CloudFront distribution url"
+    Description: "App url"
     Value: !Sub "https://${Proxy.DomainName}"
   CloudFrontDistributionSubmitApiUrl:
-    Description: "CloudFront distribution url"
+    Description: "App form submit url"
     Value: !Sub "https://${Proxy.DomainName}/${ApiStage}/submit"
   FormSubmissionFrontendBucket:
-    Description: "Form submission frontend bucket"
+    Description: "Frontend bucket"
     Value: !GetAtt FrontendBucket.DomainName
   FormSubmissionApi:
-    Description: "API Gateway endpoint URL for Form Submission function"
+    Description: "API Gateway internal endpoint"
     Value: !Sub "https://${FormSubmissionApi}.execute-api.${AWS::Region}.amazonaws.com/${ApiStage}/submit"
   FormSubmissionFunction:
-    Description: "Form Submission Lambda Function ARN"
+    Description: "Lambda Function ARN"
     Value: !GetAtt FormSubmissionFunction.Arn
   FormSubmissionsTableName:
-    Description: "Form submission dynamodb table"
+    Description: "Dynamodb table"
     Value: !Select [1, !Split ['/', !GetAtt FormSubmissionsTable.Arn]]
 
