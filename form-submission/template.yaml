@@ -81,12 +81,12 @@ Resources:
           MaxTTL: '0'
           DefaultTTL: '0'
           PathPattern: !Sub "/${ApiStage}/*"
-        CustomErrorResponses:
-        - ErrorCode: '403'
-          ResponsePagePath: "/index.html"
-          ResponseCode: '200'
-          ErrorCachingMinTTL: '30'
-          
+        #CustomErrorResponses:
+        #- ErrorCode: '403'
+        #  ResponsePagePath: "/index.html"
+        #  ResponseCode: '200'
+        #  ErrorCachingMinTTL: '30'
+
   ProxyFrontendBucketAccess:
     Type: 'AWS::CloudFront::CloudFrontOriginAccessIdentity'
     Properties:
@@ -123,6 +123,9 @@ Resources:
       CodeUri: service/
       Handler: app.lambdaHandler
       Runtime: nodejs12.x
+      Policies:
+      # Give DynamoDB Full Access to your Lambda Function
+      - AmazonDynamoDBFullAccess
       Environment:
         Variables:
           TABLE_NAME: !Select [1, !Split ['/', !GetAtt FormSubmissionsTable.Arn]]
@@ -131,7 +134,7 @@ Resources:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
             Path: /submit
-            Method: get
+            Method: post
             RestApiId: !Ref FormSubmissionApi
 
   FormSubmissionsTable: 

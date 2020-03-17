@@ -2,8 +2,10 @@
 // const url = 'http://checkip.amazonaws.com/';
 const AWS = require('aws-sdk');
 const uuid = require('uuid');
+const dynamoDb = new AWS.DynamoDB.DocumentClient();
+const tableName = process.env.TABLE_NAME;
+
 let response;
-let tableName;
 
 /**
  *
@@ -17,21 +19,29 @@ let tableName;
  * @returns {Object} object - API Gateway Lambda Proxy Output Format
  * 
  */
-exports.lambdaHandler = async (event, context) => {
-    tableName = process.env.TABLE_NAME;
+exports.lambdaHandler = async (event, context, callback) => {
+    console.log(event);
+    console.log(event.body);
     try {
-        // const ret = await axios(url);
-        response = {
+        var params = {
+            TableName: tableName,
+            Item: {
+                Id: uuid.v4(),
+                CreatedAt: (new Date().getTime()).toString(),
+                Symptoms: event.body
+            }
+        }
+
+        const data = await dynamoDb.put(params).promise();
+        return {
             'statusCode': 200,
             'body': JSON.stringify({
                 message: 'Form submission succesfull! TableName:' + tableName,
-                // location: ret.data.trim()
+                data: data
             })
         }
     } catch (err) {
         console.log(err);
         return err;
     }
-
-    return response
 };
