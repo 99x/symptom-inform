@@ -23,3 +23,18 @@ aws cloudfront create-invalidation \
 You can use the AWS SAM commands to build and deploy the API
 e.g
 sam deploy --parameter-overrides APIBasePath=api AppEnv=Dev
+
+## Running dynamodb locally
+Dynamodb locally is powered by the following NPM library, if you encounter any issues refer its documentation.
+https://www.npmjs.com/package/dynamodb-localhost
+
+Go to form-submissions/service and execute the following
+npm run dynamodb
+
+To view all the tables use following command in CLI
+aws dynamodb list-tables --endpoint-url http://localhost:8000 --region us-west-1
+
+View table data
+ aws dynamodb scan --table-name Local_Form_Data --endpoint-url http://localhost:8000 --region us-west-1
+
+

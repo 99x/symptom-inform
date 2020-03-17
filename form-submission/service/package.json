@@ -10,11 +10,13 @@
     "uuid": "^7.0.2"
   },
   "scripts": {
-    "test": "mocha tests/unit/"
+    "test": "mocha tests/unit/",
+    "dynamo": "node -e require('./development/dynamodb').setup()"
   },
   "devDependencies": {
     "aws-sdk": "^2.640.0",
     "chai": "^4.2.0",
+    "dynamodb-localhost": "0.0.9",
     "mocha": "^6.1.4"
   }
 }
