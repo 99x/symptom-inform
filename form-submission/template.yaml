@@ -101,7 +101,6 @@ Resources:
     Properties:
       Bucket: !Ref FrontendBucket
       PolicyDocument:
-      # Restricting access to cloudfront only.
         Statement:
           -
             Effect: Allow
@@ -118,20 +117,19 @@ Resources:
       EndpointConfiguration: REGIONAL
       
   FormSubmissionFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: service/
       Handler: app.lambdaHandler
       Runtime: nodejs12.x
       Policies:
-      # Give DynamoDB Full Access to your Lambda Function
       - AmazonDynamoDBFullAccess
       Environment:
         Variables:
           TABLE_NAME: !Select [1, !Split ['/', !GetAtt FormSubmissionsTable.Arn]]
       Events:
         FormSubmissionApi:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Type: Api
           Properties:
             Path: /submit
             Method: post

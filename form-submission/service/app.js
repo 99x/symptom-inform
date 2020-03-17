@@ -28,4 +28,6 @@ exports.lambdaHandler = async (event) => {
     } catch (err) {
         return err;
     }
+    
 };
+  
