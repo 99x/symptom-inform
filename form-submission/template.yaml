@@ -2,9 +2,13 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: "form-submission cloudformation template"
 Parameters:
-  ApiStage:
-    Description: Form submission API stage
+  APIBasePath:
+    Description: API Base Path e.g; /api/*
     Type: String
+  AppEnv:
+    Description: App Deployment Environment
+    Type: String
+    AllowedValues: ['Local', 'Dev', 'QA', 'Stage', 'Prod']
 
 Globals:
   Function:
@@ -15,7 +19,7 @@ Resources:
     Type: "AWS::CloudFront::Distribution"
     Properties:
       DistributionConfig:
-        Comment: "Cloudfront distribution for serverless website"
+        Comment: "Form data"
         DefaultRootObject: "index.html"
         Enabled: true
         HttpVersion: http2
@@ -26,7 +30,7 @@ Resources:
               OriginAccessIdentity: 
                 Fn::Sub: 'origin-access-identity/cloudfront/${ProxyFrontendBucketAccess}'
           - Id: api-gateway
-            DomainName: !Sub "${FormSubmissionApi}.execute-api.${AWS::Region}.amazonaws.com"
+            DomainName: !Sub "${FormDataApi}.execute-api.${AWS::Region}.amazonaws.com"
             CustomOriginConfig:
               HTTPPort: '80'
               HTTPSPort: '443'
@@ -53,7 +57,7 @@ Resources:
           MinTTL: '0'
           MaxTTL: '0'
           DefaultTTL: '0'
-          PathPattern: !Sub "/${ApiStage}/*"
+          PathPattern: !Sub "/${APIBasePath}/*"
         #CustomErrorResponses:
         #- ErrorCode: '403'
         #  ResponsePagePath: "/index.html"
@@ -64,7 +68,7 @@ Resources:
     Type: 'AWS::CloudFront::CloudFrontOriginAccessIdentity'
     Properties:
       CloudFrontOriginAccessIdentityConfig:
-        Comment: 'Form submission frontend access'
+        Comment: 'Form data frontend access'
 
   FrontendBucket:
     Type: AWS::S3::Bucket
@@ -83,13 +87,13 @@ Resources:
             Principal:
               AWS: !Sub "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${ProxyFrontendBucketAccess}"
 
-  FormSubmissionApi:
+  FormDataApi:
     Type: AWS::Serverless::Api
     Properties:
-      StageName: !Ref ApiStage
+      StageName: !Ref APIBasePath
       EndpointConfiguration: REGIONAL
       
-  FormSubmissionFunction:
+  FormDataLambda:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: service/
@@ -99,16 +103,16 @@ Resources:
       - AmazonDynamoDBFullAccess
       Environment:
         Variables:
-          TABLE_NAME: !Select [1, !Split ['/', !GetAtt FormSubmissionsTable.Arn]]
+          TABLE_NAME: !Select [1, !Split ['/', !GetAtt FormDataTable.Arn]]
       Events:
-        FormSubmissionApi:
+        FormDataApi:
           Type: Api
           Properties:
             Path: /submit
             Method: post
-            RestApiId: !Ref FormSubmissionApi
+            RestApiId: !Ref FormDataApi
 
-  FormSubmissionsTable: 
+  FormDataTable: 
     Type: AWS::DynamoDB::Table
     Properties: 
       AttributeDefinitions:       
@@ -125,26 +129,23 @@ Resources:
         - 
           AttributeName: "CreatedAt"
           KeyType: "RANGE"
-      TableName: !Sub "${ApiStage}_form_submissions"
+      TableName: !Sub "${AppEnv}_Form_Data"
       BillingMode: PAY_PER_REQUEST          
 
 Outputs:
-  CloudFrontDistributionFrontendUrl:
-    Description: "App url"
+  CloudFrontURL:
+    Description: "App URL"
     Value: !Sub "https://${Proxy.DomainName}"
-  CloudFrontDistributionSubmitApiUrl:
-    Description: "App form submit url"
-    Value: !Sub "https://${Proxy.DomainName}/${ApiStage}/submit"
-  FormSubmissionFrontendBucket:
-    Description: "Frontend bucket"
+  CloudFrontPostURL:
+    Description: "App form action URL"
+    Value: !Sub "https://${Proxy.DomainName}/${APIBasePath}/submit"
+  FormFrontendS3Bucket:
+    Description: "Frontend S3 bucket"
     Value: !GetAtt FrontendBucket.DomainName
-  FormSubmissionApi:
-    Description: "API Gateway internal endpoint"
-    Value: !Sub "https://${FormSubmissionApi}.execute-api.${AWS::Region}.amazonaws.com/${ApiStage}/submit"
-  FormSubmissionFunction:
+  FormDataLambdaFunction:
     Description: "Lambda Function ARN"
-    Value: !GetAtt FormSubmissionFunction.Arn
-  FormSubmissionsTableName:
-    Description: "Dynamodb table"
-    Value: !Select [1, !Split ['/', !GetAtt FormSubmissionsTable.Arn]]
+    Value: !GetAtt FormDataLambda.Arn
+  FormDataDynamoDBTableName:
+    Description: "Dynamodb table used to store form data"
+    Value: !Select [1, !Split ['/', !GetAtt FormDataTable.Arn]]
 

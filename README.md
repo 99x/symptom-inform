@@ -22,4 +22,4 @@ aws cloudfront create-invalidation \
 ## Deploying Backend Code
 You can use the AWS SAM commands to build and deploy the API
 e.g
-sam deploy --parameter-overrides ApiStage=api
+sam deploy --parameter-overrides APIBasePath=api AppEnv=Dev
